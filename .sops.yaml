@@ -1,0 +1,24 @@
+# Generate admin key to decrypt:
+#   mkdir -p ~/.config/sops/age
+#   age-keygen -o ~/.config/sops/age/keys.txt
+#
+# The machine's age key so it can decrypt at boot:
+#   ssh-keyscan -t ed25519 192.168.1.10 | ssh-to-age
+keys:
+  - &admin age18a7ytcdjp48sqf8hdfwyfqs76ys0zkwe2wgevn0df263shu4gvush59u92
+  - &saturn age1tmxzy8glh49jpdfhc38xe3xh7e6m8lxmzqlp5wem7fxdqazd9p2qwdxmlw
+
+creation_rules:
+  # Machine secrets.
+  - path_regex: secrets/saturn\.yaml$
+    key_groups:
+      - age:
+          - *admin
+          - *saturn
+
+  # Service env files.
+  - path_regex: secrets/[^/]+\.env$
+    key_groups:
+      - age:
+          - *admin
+          - *saturn
