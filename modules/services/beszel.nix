@@ -23,9 +23,9 @@ in
 
       appUrl = lib.mkOption {
         type = lib.types.str;
-        default = "";
-        example = "http://host.tailnet.ts.net:8090";
-        description = "Canonical URL for the generated links and HUB_URL.";
+        default = "http://${config.networking.hostName}:${toString cfg.hub.port}";
+        defaultText = lib.literalMD "The host's own name on `hub.port`.";
+        description = "Canonical URL the hub puts in generated links.";
       };
     };
 
@@ -50,7 +50,15 @@ in
         description = "Address the agent serves on, dialled by the hub.";
       };
 
-      smartmon = lib.mkEnableOption "SMART monitoring: drive health and temperature.";
+      smartmon = {
+        enable = lib.mkEnableOption "SMART monitoring: drive health and temperature.";
+        devices = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          default = [ ];
+          example = [ "/dev/nvme0" ];
+          description = "Devices smartctl may read. The agent is confined to these.";
+        };
+      };
     };
   };
 
@@ -62,6 +70,18 @@ in
         host = "0.0.0.0";
         inherit (cfg.hub) port;
         environment = lib.optionalAttrs (cfg.hub.appUrl != "") { APP_URL = cfg.hub.appUrl; };
+      };
+
+      systemd.services.beszel-hub.serviceConfig = {
+        CapabilityBoundingSet = [ ];
+        RestrictAddressFamilies = [
+          "AF_INET"
+          "AF_INET6"
+          "AF_UNIX"
+          "AF_NETLINK"
+        ];
+        ProtectProc = "invisible";
+        ProcSubset = "pid";
       };
 
       # The pocketbase database, and the key the agent is told to trust.
@@ -80,11 +100,24 @@ in
         enable = true;
         # The hub is the only consumer and it dials over loopback.
         openFirewall = false;
-        smartmon.enable = cfg.agent.smartmon;
+        smartmon = {
+          enable = cfg.agent.smartmon.enable;
+          deviceAllow = cfg.agent.smartmon.devices;
+        };
         environment = {
           KEY = cfg.agent.key;
           LISTEN = cfg.agent.listen;
         };
+      };
+
+      systemd.services.beszel-agent.serviceConfig = {
+        RestrictNamespaces = true;
+        RestrictAddressFamilies = [
+          "AF_INET"
+          "AF_INET6"
+          "AF_UNIX"
+          "AF_NETLINK"
+        ];
       };
 
       assertions = [
@@ -93,8 +126,14 @@ in
           message = ''
             homelab.beszel.agent is enabled without a key. The agent has
             nothing to authenticate the hub against and exits at startup.
-            Set homelab.beszel.agent.key to the KEY the hub shows in its
-            "Add System" dialog.
+          '';
+        }
+        {
+          assertion = !cfg.agent.smartmon.enable || cfg.agent.smartmon.devices != [ ];
+          message = ''
+            homelab.beszel.agent.smartmon is enabled without smartmon.devices.
+            SMART needs CAP_SYS_ADMIN and the disk group, and with no device
+            list the agent reaches every device node.
           '';
         }
       ];

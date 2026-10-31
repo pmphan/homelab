@@ -45,13 +45,16 @@
     autoDeploy.enable = true;
 
     beszel = {
-      hub = {
-        enable = true;
-        appUrl = "http://saturn:8090";
-      };
+      hub.enable = true;
       agent = {
         key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP9KlzcoUpWzDjqZExQCpg9VnMSollaHHyKYhs6bxlKu";
-        smartmon = true;
+        smartmon = {
+          enable = true;
+          devices = [
+            "/dev/nvme0"
+            "/dev/nvme0n1"
+          ];
+        };
       };
     };
 
@@ -62,12 +65,6 @@
 
     # / is recreated empty on every boot; state is declared in /persist.
     impermanence.enable = true;
-
-    # / is recreated every boot and therefore doesn't need snapshots.
-    snapshots.subvolumes = [
-      "@persist"
-      "@home"
-    ];
   };
 
   # Generated hardware facts, read by facter.

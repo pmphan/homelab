@@ -11,6 +11,8 @@ let
 in
 {
   options.homelab.snapshots = {
+    enable = lib.mkEnableOption "Hourly snapshots of the listed subvolumes.";
+
     device = lib.mkOption {
       type = lib.types.str;
       default = config.fileSystems."/".device;
@@ -24,7 +26,7 @@ in
     };
   };
 
-  config = {
+  config = lib.mkIf cfg.enable {
     fileSystems.${pool} = {
       inherit (cfg) device;
       fsType = "btrfs";
