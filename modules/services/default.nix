@@ -1,3 +1,6 @@
 {
-  imports = [ ];
+  imports = [
+    ./beszel.nix
+    ./tsidp.nix
+  ];
 }

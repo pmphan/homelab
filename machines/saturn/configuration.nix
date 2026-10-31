@@ -1,5 +1,4 @@
-# Machine: saturn — Intel N150 mini-PC, 16 GB, 512 GB NVMe
-{ ... }:
+{ config, ... }:
 {
   imports = [
     ./disko.nix
@@ -8,7 +7,17 @@
 
   sops = {
     defaultSopsFile = ../../secrets/saturn.yaml;
-    secrets."users/pmphan".neededForUsers = true;
+
+    secrets = {
+      "users/pmphan".neededForUsers = true;
+      "tailscale/authKey" = { };
+      "tsidp/authKey" = { };
+    };
+
+    # tsidp reads the key from the environment, not from a bare key file.
+    templates."tsidp.env".content = ''
+      TS_AUTH_KEY=${config.sops.placeholder."tsidp/authKey"}
+    '';
   };
 
   homelab = {
@@ -30,9 +39,26 @@
     tailscale = {
       enable = true;
       ssh = true;
+      authKeyFile = config.sops.secrets."tailscale/authKey".path;
     };
 
     autoDeploy.enable = true;
+
+    beszel = {
+      hub = {
+        enable = true;
+        appUrl = "http://saturn:8090";
+      };
+      agent = {
+        key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP9KlzcoUpWzDjqZExQCpg9VnMSollaHHyKYhs6bxlKu";
+        smartmon = true;
+      };
+    };
+
+    tsidp = {
+      enable = true;
+      authKeyFile = config.sops.templates."tsidp.env".path;
+    };
 
     # / is recreated empty on every boot; state is declared in /persist.
     impermanence.enable = true;

@@ -12,12 +12,19 @@ in
   options.homelab.tailscale = {
     enable = lib.mkEnableOption "Tailscale, joined by hand with `tailscale up`.";
     ssh = lib.mkEnableOption "Tailscale SSH.";
+
+    authKeyFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = "File holding an auth key.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
     services.tailscale = {
       enable = true;
       extraSetFlags = lib.optional cfg.ssh "--ssh";
+      inherit (cfg) authKeyFile;
     };
 
     # Allow services to be reach-able over tailnet.

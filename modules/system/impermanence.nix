@@ -124,6 +124,12 @@ in
       unlock.hostKey = lib.mkDefault "${cfg.persistMountpoint}/etc/secrets/initrd/ssh_host_ed25519_key";
     };
 
+    # systemd keeps DynamicUser state under /var/lib/private and refuses it
+    # unless that parent is 0700.
+    systemd.tmpfiles.rules = [
+      "z ${cfg.persistMountpoint}/var/lib/private 0700 root root -"
+    ];
+
     # Cap coredump in /var/lib/systemd/coredump.
     systemd.coredump.settings.Coredump.MaxUse = lib.mkDefault "1G";
 
