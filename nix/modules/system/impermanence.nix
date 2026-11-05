@@ -105,7 +105,7 @@ in
     fileSystems.${cfg.persistMountpoint}.neededForBoot = true;
 
     # SSH host keys live in /persist directly rather than bind-mounted into
-    # /etc/ssh. sops reads the ed25519 key from an activation script iniside
+    # /etc/ssh. sops reads the ed25519 key from an activation script inside
     # initrd-nixos-activation, before switch-root, where /persist is mounted
     # but not /etc/ssh bind mounts.
     services.openssh.hostKeys = [

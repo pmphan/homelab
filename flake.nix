@@ -59,7 +59,7 @@
             sops-nix.nixosModules.sops
             impermanence.nixosModules.impermanence
             comin.nixosModules.comin
-            ./machines/saturn/configuration.nix
+            ./nix/machines/saturn/configuration.nix
           ];
         };
       };

@@ -7,7 +7,7 @@
   ];
 
   sops = {
-    defaultSopsFile = ../../secrets/saturn.yaml;
+    defaultSopsFile = ../../../secrets/saturn.yaml;
 
     useSystemdActivation = true;
 
@@ -35,28 +35,23 @@
   };
 
   homelab = {
-    domain = "lan";
-
     host = {
       name = "saturn";
       address = "192.168.1.10/24";
-      gateway = "192.168.1.1";
-      nameservers = [
-        "192.168.1.1"
-        "1.1.1.1"
-      ];
       nicModules = [ "r8169" ];
     };
 
     unlock.enable = true;
+
+    autoDeploy.enable = true;
+
+    impermanence.enable = true;
 
     tailscale = {
       enable = true;
       ssh = true;
       authKeyFile = config.sops.secrets."tailscale/authKey".path;
     };
-
-    autoDeploy.enable = true;
 
     tsidp = {
       enable = true;
@@ -78,16 +73,11 @@
         clientSecretFile = config.sops.secrets."immich/oauthClientSecret".path;
       };
     };
-
-    # / is recreated empty on every boot; state is declared in /persist.
-    impermanence.enable = true;
   };
-
-  # Generated hardware facts, read by facter.
-  hardware.facter.reportPath = ./facter.json;
 
   boot.kernelParams = [ "usbcore.autosuspend=-1" ];
 
+  hardware.facter.reportPath = ./facter.json;
   hardware.bluetooth.enable = false;
 
   time.timeZone = "Asia/Ho_Chi_Minh";
