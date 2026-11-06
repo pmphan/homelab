@@ -50,18 +50,23 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-    in
-    {
-      nixosConfigurations = {
-        saturn = nixpkgs.lib.nixosSystem {
+
+      host =
+        name:
+        nixpkgs.lib.nixosSystem {
           modules = [
             disko.nixosModules.disko
             sops-nix.nixosModules.sops
             impermanence.nixosModules.impermanence
             comin.nixosModules.comin
-            ./nix/machines/saturn/configuration.nix
+            ./nix/machines/${name}/configuration.nix
           ];
         };
+    in
+    {
+      nixosConfigurations = {
+        saturn = host "saturn";
+        jupiter = host "jupiter";
       };
 
       # Layout of saturn's media disk. Kept out of the host's disko.devices so
@@ -69,9 +74,9 @@
       diskoConfigurations.saturn-media =
         self.nixosConfigurations.saturn.config.system.build.mediaDiskLayout;
 
-      checks.${system} = {
-        build = self.nixosConfigurations.saturn.config.system.build.toplevel;
-      };
+      checks.${system} = nixpkgs.lib.mapAttrs (
+        _: machine: machine.config.system.build.toplevel
+      ) self.nixosConfigurations;
 
       # Pinned, so the disk is built by the disko the config was written against.
       packages.${system}.disko = disko.packages.${system}.disko;

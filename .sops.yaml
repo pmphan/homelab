@@ -7,6 +7,7 @@
 keys:
   - &admin age18a7ytcdjp48sqf8hdfwyfqs76ys0zkwe2wgevn0df263shu4gvush59u92
   - &saturn age1sqk549ac5qfzgnketcfdeudn4g3q265envlzduyf6jsa7y5myahq5fu7da
+  - &jupiter age1sqzw4vnc925alzrj7wpz7y504r5eap36ndn4zd084t9rlh6ul5mq8p3yg5
 
 creation_rules:
   # Machine secrets.
@@ -15,6 +16,12 @@ creation_rules:
       - age:
           - *admin
           - *saturn
+
+  - path_regex: secrets/jupiter\.yaml$
+    key_groups:
+      - age:
+          - *admin
+          - *jupiter
 
   # Service env files.
   - path_regex: secrets/[^/]+\.env$
