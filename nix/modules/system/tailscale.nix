@@ -10,8 +10,8 @@ let
 in
 {
   options.homelab.tailscale = {
-    enable = lib.mkEnableOption "Tailscale, joined by hand with `tailscale up`.";
-    ssh = lib.mkEnableOption "Tailscale SSH.";
+    enable = lib.mkEnableOption "Tailscale";
+    ssh = lib.mkEnableOption "Tailscale SSH";
 
     authKeyFile = lib.mkOption {
       type = lib.types.nullOr lib.types.path;

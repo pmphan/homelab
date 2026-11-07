@@ -17,9 +17,9 @@
     host = {
       name = "jupiter";
       address = "192.168.1.20/24";
-      # Two r8169 ports; pin only enp2s0.
-      interfaceMatch.Name = "enp2s0";
+      interface = "enp2s0";
       nicModules = [ "r8169" ];
+      wakeOnLan = true;
     };
 
     unlock.enable = true;

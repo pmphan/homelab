@@ -10,7 +10,7 @@ let
 in
 {
   options.homelab.autoDeploy = {
-    enable = lib.mkEnableOption "Deploying commits on the tracked branch as they land.";
+    enable = lib.mkEnableOption "deploying commits on the tracked branch as they land";
 
     url = lib.mkOption {
       type = lib.types.str;

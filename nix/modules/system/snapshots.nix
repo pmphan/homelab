@@ -11,7 +11,7 @@ let
 in
 {
   options.homelab.snapshots = {
-    enable = lib.mkEnableOption "Hourly snapshots of the listed subvolumes.";
+    enable = lib.mkEnableOption "hourly snapshots of the listed subvolumes";
 
     device = lib.mkOption {
       type = lib.types.str;

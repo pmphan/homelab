@@ -15,7 +15,7 @@ let
 in
 {
   options.homelab.impermanence = {
-    enable = lib.mkEnableOption "An ephemeral root, with state declared in /persist";
+    enable = lib.mkEnableOption "ephemeral root, with state declared in /persist";
 
     device = lib.mkOption {
       type = lib.types.str;

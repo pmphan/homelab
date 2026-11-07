@@ -38,6 +38,7 @@
     host = {
       name = "saturn";
       address = "192.168.1.10/24";
+      interface = "enp1s0";
       nicModules = [ "r8169" ];
     };
 

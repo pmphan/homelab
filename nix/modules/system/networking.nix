@@ -1,52 +1,47 @@
 { config, lib, ... }:
 let
-  inherit (lib) mkOption types;
   host = config.homelab.host;
   domain = config.homelab.domain;
 in
 {
   options.homelab = {
-    domain = mkOption {
-      type = types.str;
+    domain = lib.mkOption {
+      type = lib.types.str;
       default = "lan";
       description = "DNS domain for machines in this homelab.";
     };
 
     host = {
-      name = mkOption {
-        type = types.str;
+      name = lib.mkOption {
+        type = lib.types.str;
         description = "Hostname.";
       };
 
-      address = mkOption {
-        type = types.str;
+      address = lib.mkOption {
+        type = lib.types.str;
         description = "Static address in CIDR form.";
       };
 
-      gateway = mkOption {
-        type = types.str;
+      gateway = lib.mkOption {
+        type = lib.types.str;
         default = "192.168.1.1";
       };
 
-      nameservers = mkOption {
-        type = types.listOf types.str;
+      nameservers = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
         default = [
           "192.168.1.1"
           "1.1.1.1"
         ];
       };
 
-      interfaceMatch = mkOption {
-        type = types.attrsOf types.str;
-        default = {
-          Type = "ether";
-          Name = "en*";
-        };
-        description = "systemd.network [Match] for the primary wired NIC.";
+      interface = lib.mkOption {
+        type = lib.types.str;
+        description = "Primary wired NIC, as a name or a glob: `ls /sys/class/net`.";
       };
 
-      nicModules = mkOption {
-        type = types.listOf types.str;
+      nicModules = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
         default = [ ];
         description = ''
           Kernel modules the initrd needs to bring that NIC up:
@@ -54,12 +49,16 @@ in
         '';
       };
 
-      primaryNetwork = mkOption {
-        type = types.attrsOf types.anything;
+      wakeOnLan = lib.mkEnableOption "waking host from poweroff with a magic packet to the primary NIC";
+
+      primaryNetwork = lib.mkOption {
+        type = lib.types.attrsOf lib.types.anything;
         internal = true;
         readOnly = true;
         default = {
-          matchConfig = host.interfaceMatch;
+          matchConfig = {
+            Name = host.interface;
+          };
           address = [ host.address ];
           routes = [ { Gateway = host.gateway; } ];
           linkConfig.RequiredForOnline = "routable";
@@ -83,6 +82,11 @@ in
     };
 
     systemd.network.networks."10-lan" = host.primaryNetwork;
+
+    systemd.network.links."10-lan" = lib.mkIf host.wakeOnLan {
+      matchConfig.OriginalName = host.interface;
+      linkConfig.WakeOnLan = "magic";
+    };
 
     assertions = [
       {

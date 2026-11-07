@@ -14,7 +14,7 @@ let
 in
 {
   options.homelab.immich = {
-    enable = lib.mkEnableOption "A photo library, reachable over the tailnet.";
+    enable = lib.mkEnableOption "Immich photo library service";
 
     port = lib.mkOption {
       type = lib.types.port;
@@ -36,7 +36,7 @@ in
     };
 
     oauth = {
-      enable = lib.mkEnableOption "Login through an OIDC provider instead of a local password.";
+      enable = lib.mkEnableOption "login through an OIDC provider instead of a local password";
 
       issuerUrlFile = lib.mkOption {
         type = lib.types.path;

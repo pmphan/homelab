@@ -30,7 +30,7 @@ let
 in
 {
   options.homelab.tsidp = {
-    enable = lib.mkEnableOption "An OIDC provider backed by tailnet identity.";
+    enable = lib.mkEnableOption "an OIDC provider backed by tailnet identity";
 
     hostName = lib.mkOption {
       type = lib.types.str;

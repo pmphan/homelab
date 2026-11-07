@@ -9,6 +9,7 @@ NixOS configuration, deployed from a flake. Commands run from the repo root.
 - **Encryption:** Disk is encrypted and unlocked on boot via SSH into the initrd.
 - **Auto-deploy:** Host periodically polls this repo and switch to the new commits with `comin`.
 - **Tailscale:** Host is reachable over the tailnet, with Tailscale SSH.
+- **Wake-on-LAN:** Host wakes from poweroff on a magic packet *(opt-in)*.
 
 ## Layout
 
@@ -39,6 +40,10 @@ Roll back:
 Deploy state:
 
     ssh <user>@<host> comin status
+
+Wake a host that is off, from anything on the same LAN:
+
+    wakeonlan <mac>
 
 Tailnet state:
 
