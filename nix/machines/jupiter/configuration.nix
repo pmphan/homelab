@@ -27,6 +27,8 @@
     autoDeploy.enable = true;
 
     impermanence.enable = true;
+
+    moonlight.enable = true;
   };
 
   hardware.facter.reportPath = ./facter.json;
