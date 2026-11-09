@@ -28,6 +28,8 @@ in
 
     hardware.bluetooth.enable = true;
 
+    environment.systemPackages = [ pkgs.bluetuith ];
+
     security.rtkit.enable = true;
 
     users.users.${cfg.user} = {
