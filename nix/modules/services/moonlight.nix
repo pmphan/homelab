@@ -48,7 +48,7 @@ in
       settings = {
         terminal.vt = 1;
         default_session = {
-          command = lib.getExe pkgs.moonlight-qt;
+          command = "${pkgs.systemd}/bin/systemd-cat -t moonlight ${lib.getExe pkgs.moonlight-qt}";
           user = cfg.user;
         };
       };
