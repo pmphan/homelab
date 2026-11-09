@@ -9,7 +9,6 @@ let
   cfg = config.homelab.moonlight;
   impermanence = config.homelab.impermanence or { enable = false; };
 
-  tty = "tty1";
   home = "/var/lib/${cfg.user}";
 in
 {
@@ -44,31 +43,14 @@ in
 
     users.groups.${cfg.user} = { };
 
-    services.pipewire = {
+    services.greetd = {
       enable = true;
-      audio.enable = true;
-    };
-
-    systemd.services.moonlight = {
-      description = "Moonlight game streaming client on ${tty}";
-
-      # getty would otherwise be holding the console this needs.
-      after = [ "getty@${tty}.service" ];
-      conflicts = [ "getty@${tty}.service" ];
-      wantedBy = [ "multi-user.target" ];
-
-      serviceConfig = {
-        User = cfg.user;
-        Group = cfg.user;
-
-        ExecStart = lib.getExe pkgs.moonlight-qt;
-
-        # TTYPath applies only when a standard stream is a tty.
-        TTYPath = "/dev/${tty}";
-        StandardInput = "tty-fail";
-
-        # Start as a login session for Pipewire.
-        PAMName = "login";
+      settings = {
+        terminal.vt = 1;
+        default_session = {
+          command = lib.getExe pkgs.moonlight-qt;
+          user = cfg.user;
+        };
       };
     };
 
