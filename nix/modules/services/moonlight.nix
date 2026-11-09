@@ -28,6 +28,8 @@ in
 
     hardware.bluetooth.enable = true;
 
+    security.rtkit.enable = true;
+
     users.users.${cfg.user} = {
       isSystemUser = true;
       group = cfg.user;
