@@ -34,6 +34,9 @@
   # TODO: Temporary
   networking.firewall.enable = lib.mkForce false;
 
+  # Early KMS.
+  boot.initrd.kernelModules = [ "amdgpu" ];
+
   hardware.facter.reportPath = ./facter.json;
 
   time.timeZone = "Asia/Ho_Chi_Minh";
