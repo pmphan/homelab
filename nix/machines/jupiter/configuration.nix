@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 {
   imports = [
     ./disko.nix
@@ -30,6 +30,9 @@
 
     moonlight.enable = true;
   };
+
+  # TODO: Temporary
+  networking.firewall.enable = lib.mkForce false;
 
   hardware.facter.reportPath = ./facter.json;
 
