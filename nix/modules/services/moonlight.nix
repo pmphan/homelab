@@ -33,11 +33,7 @@ in
     security.rtkit.enable = true;
 
     # mDNS, for host discovery on the LAN.
-    networking.firewall.allowedUDPPorts = [
-      5353
-      47998
-      48000
-    ];
+    networking.firewall.allowedUDPPorts = [ 5353 ];
 
     users.users.${cfg.user} = {
       isSystemUser = true;

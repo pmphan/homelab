@@ -31,9 +31,6 @@
     moonlight.enable = true;
   };
 
-  # TODO: Temporary
-  networking.firewall.enable = lib.mkForce false;
-
   # Early KMS.
   boot.initrd.kernelModules = [ "amdgpu" ];
 
