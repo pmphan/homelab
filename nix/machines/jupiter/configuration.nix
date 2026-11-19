@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   imports = [
     ./disko.nix
@@ -32,6 +37,7 @@
       enable = true;
       # Start at 4K120; the stream's mode switch goes through SDL and never lands.
       kms = {
+        device = "/dev/dri/card1";
         outputs = [
           {
             name = "HDMI1";
