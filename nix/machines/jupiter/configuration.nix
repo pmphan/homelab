@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 {
   imports = [
     ./disko.nix
@@ -27,7 +27,12 @@
     autoDeploy.enable = true;
 
     impermanence.enable = true;
+
+    moonlight.enable = true;
   };
+
+  # Early KMS.
+  boot.initrd.kernelModules = [ "amdgpu" ];
 
   hardware.facter.reportPath = ./facter.json;
 
