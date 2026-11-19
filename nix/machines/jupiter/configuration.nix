@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 {
   imports = [
     ./disko.nix
@@ -28,11 +28,26 @@
 
     impermanence.enable = true;
 
-    moonlight.enable = true;
+    moonlight = {
+      enable = true;
+      # Start at 4K120; the stream's mode switch goes through SDL and never lands.
+      kms = {
+        outputs = [
+          {
+            name = "HDMI1";
+            mode = "3840x2160@120";
+          }
+        ];
+      };
+    };
   };
 
   # Early KMS.
   boot.initrd.kernelModules = [ "amdgpu" ];
+
+  # HDMI 2.1 FRL. Not default until 7.4.
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelParams = [ "amdgpu.dcfeaturemask=0x402" ];
 
   hardware.facter.reportPath = ./facter.json;
 
