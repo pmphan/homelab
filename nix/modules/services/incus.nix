@@ -80,10 +80,10 @@ in
         description = "Serve the web UI from the HTTPS API.";
       };
 
-      address = lib.mkOption {
-        type = lib.types.str;
-        default = "127.0.0.1:8443";
-        description = "Listen address for the HTTPS API the UI is served from.";
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 8443;
+        description = "Port the HTTPS API, and the UI on it, listens on.";
       };
     };
   };
@@ -92,12 +92,17 @@ in
     networking.nftables.enable = true;
 
     networking.firewall = {
-      interfaces.${cfg.bridge.name} = {
-        allowedUDPPorts = [
-          53
-          67
-        ];
-        allowedTCPPorts = [ 53 ];
+      interfaces = {
+        ${cfg.bridge.name} = {
+          allowedUDPPorts = [
+            53
+            67
+          ];
+          allowedTCPPorts = [ 53 ];
+        };
+      }
+      // lib.optionalAttrs (cfg.ui.enable) {
+        ${config.homelab.host.interface}.allowedTCPPorts = [ cfg.ui.port ];
       };
       filterForward = true;
       extraForwardRules = ''
@@ -115,7 +120,7 @@ in
       ui.enable = cfg.ui.enable;
 
       preseed = lib.mkIf cfg.preseed {
-        config = lib.optionalAttrs cfg.ui.enable { "core.https_address" = cfg.ui.address; };
+        config = lib.optionalAttrs cfg.ui.enable { "core.https_address" = ":${toString cfg.ui.port}"; };
 
         networks = [
           {
