@@ -8,4 +8,3 @@ Homelab configuration with NixOS hosts deployed from a flake, and OpenWRT router
     nix/                    the NixOS stack      -> nix/README.md
     ansible/                the OpenWrt router   -> ansible/README.md
     secrets/                sops-encrypted, decrypted by the host key
-

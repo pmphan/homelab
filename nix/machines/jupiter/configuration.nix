@@ -33,6 +33,11 @@
 
     impermanence.enable = true;
 
+    incus = {
+      enable = true;
+      admins = [ "pmphan" ];
+    };
+
     moonlight = {
       enable = true;
       # Start at 4K120; the stream's mode switch goes through SDL and never lands.

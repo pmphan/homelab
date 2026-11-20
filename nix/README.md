@@ -5,11 +5,11 @@ NixOS configuration, deployed from a flake. Commands run from the repo root.
 ## Features
 
 - **Impermanence:** Root is wiped on every boot, except for data explicitly allowed to persist.
-- **Snapshots:** Filesystem is btrfs and is snapshotted periodically via `btrbk` *(opt-in)*.
+- **Snapshots:** Filesystem is btrfs and is snapshotted periodically via `btrbk` _(opt-in)_.
 - **Encryption:** Disk is encrypted and unlocked on boot via SSH into the initrd.
 - **Auto-deploy:** Host periodically polls this repo and switch to the new commits with `comin`.
 - **Tailscale:** Host is reachable over the tailnet, with Tailscale SSH.
-- **Wake-on-LAN:** Host wakes from poweroff on a magic packet *(opt-in)*.
+- **Wake-on-LAN:** Host wakes from poweroff on a magic packet _(opt-in)_.
 
 ## Layout
 
@@ -70,7 +70,7 @@ Write the host's secrets:
 
 ```yaml
 users:
-    pmphan: <mkpasswd -m sha512crypt>
+  pmphan: <mkpasswd -m sha512crypt>
 ```
 
 Or re-encrypt the existing file:
@@ -81,7 +81,7 @@ The LUKS passphrase:
 
     printf '%s' 'the-luks-passphrase' > /tmp/luks.key
 
-*Note:* `kexec` carries the host keys by grepping over `/etc/ssh/ssh_host_*`. This might return nothing on a host installed following this repo, as the host keys are located in `/persist/etc/ssh/` instead. Install the keys temporarily in the target:
+_Note:_ `kexec` carries the host keys by grepping over `/etc/ssh/ssh_host_*`. This might return nothing on a host installed following this repo, as the host keys are located in `/persist/etc/ssh/` instead. Install the keys temporarily in the target:
 
 ```
 sudo install -m 600 /persist/etc/ssh/ssh_host_ed25519_key /etc/ssh/ssh_host_ed25519_key
