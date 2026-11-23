@@ -8,6 +8,7 @@
 #                                  ├── @nix        /nix
 #                                  ├── @home       /home        nodev,nosuid
 #                                  ├── @log        /var/log     nodev,nosuid,noexec
+#                                  ├── @incus      /var/lib/incus
 #                                  └── @old        not mounted; see
 #                                                  modules/impermanence.nix
 
@@ -91,6 +92,10 @@
                   "@log" = {
                     mountpoint = "/var/log";
                     mountOptions = hardened ++ [ "noexec" ];
+                  };
+                  "@incus" = {
+                    mountpoint = "/var/lib/incus";
+                    mountOptions = base ++ [ "nofail" ];
                   };
                 };
             };

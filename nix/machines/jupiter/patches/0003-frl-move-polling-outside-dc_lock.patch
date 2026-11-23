@@ -1,0 +1,61 @@
+From 406a850b0dd28d969bdbff726d7841d25d770cb3 Mon Sep 17 00:00:00 2001
+From: Fangzhi Zuo <jerry.zuo@amd.com>
+Date: Sat, 24 Oct 2026 15:26:56 -0400
+Subject: [PATCH] drm/amd/display: Move HDMI FRL Polling Outside dc_lock
+
+[Why]
+amdgpu_dm_commit_streams() started or cancelled the self-rearming HDMI FRL
+poll under dm->dc_lock. cancel_delayed_work_sync() can wait for a worker
+that needs the same lock, creating a lock dependency that could deadlock.
+
+[How]
+Release dm->dc_lock after dc_commit_streams() and the idle-optimization
+update, then scan the committed streams and start or stop FRL polling
+outside the lock.
+
+Cc: Harry Wentland <harry.wentland@amd.com>
+Reviewed-by: ChiaHsuan Chung <chiahsuan.chung@amd.com>
+Signed-off-by: Fangzhi Zuo <jerry.zuo@amd.com>
+Signed-off-by: Wayne Lin <wayne.lin@amd.com>
+Tested-by: Dan Wheeler <daniel.wheeler@amd.com>
+Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
+(cherry picked from commit 7a1807cd11a8c2bd26d48de6829d82ae62ad622d)
+---
+ drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
+index 0ea45ab12119c5..2c5831dde8f699 100644
+--- a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
++++ b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
+@@ -4733,6 +4733,11 @@ static void amdgpu_dm_commit_streams(struct drm_atomic_commit *state,
+ 	dc_exit_ips_for_hw_access(dm->dc);
+ 	WARN_ON(!dc_commit_streams(dm->dc, &params));
+ 
++	/* Allow idle optimization when vblank count is 0 for display off */
++	if (dm->active_vblank_irq_count == 0 && amdgpu_dm_is_headless(dm->adev))
++		dc_allow_idle_optimizations(dm->dc, true);
++	mutex_unlock(&dm->dc_lock);
++
+ 	bool frl_stream_found = false;
+ 
+ 	for (i = 0; i < params.stream_count; i++) {
+@@ -4743,6 +4748,7 @@ static void amdgpu_dm_commit_streams(struct drm_atomic_commit *state,
+ 			break;
+ 		}
+ 	}
++
+ 	if (frl_stream_found) {
+ 		if (queue_delayed_work(dm->hdmi_frl_status_polling_wq,
+ 				       &dm->hdmi_frl_status_polling_work,
+@@ -4752,10 +4758,6 @@ static void amdgpu_dm_commit_streams(struct drm_atomic_commit *state,
+ 		if (cancel_delayed_work_sync(&dm->hdmi_frl_status_polling_work))
+ 			drm_dbg_kms(dev, "200ms frl status polling stops ...\n");
+ 	}
+-	/* Allow idle optimization when vblank count is 0 for display off */
+-	if ((dm->active_vblank_irq_count == 0) && amdgpu_dm_is_headless(dm->adev))
+-		dc_allow_idle_optimizations(dm->dc, true);
+-	mutex_unlock(&dm->dc_lock);
+ 
+ 	for_each_new_crtc_in_state(state, crtc, new_crtc_state, i) {
+ 		struct amdgpu_crtc *acrtc = to_amdgpu_crtc(crtc);
